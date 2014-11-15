@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>League Bowling Insights Calculator</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+
+        <link rel="stylesheet" href="css/normalize.css">
+        <link rel="stylesheet" href="css/main.css">
+        <link rel="stylesheet" href="css/app.css">
+        <script src="js/vendor/modernizr-2.6.2.min.js"></script>
+
+        <script>
+
+          function blurAll() {
+
+            var inputs, index;
+            inputs = document.getElementsByTagName('input');
+            for (index = 0; index < inputs.length; ++index) {
+                inputs[index].blur();
+            }
+
+          }
+
+          function calc() {
+
+            // Settings
+            var NUM_DECIMAL_PLACES = 2;
+            var NUM_GAMES_IN_SERIES = 3;
+            var TARGET_AVE_1_DELTA = -5;
+            var TARGET_AVE_2_DELTA = 1;
+            var TARGET_AVE_3_DELTA = 2;
+            var TARGET_AVE_4_DELTA = 3;
+
+            // Gather required variables from input.  They will be NaN on invalid input.
+            var startingPins = parseInt(document.getElementById("txtStartingPins").value);
+            var startingGames = parseInt(document.getElementById("txtStartingGames").value);
+            var game1Score = parseInt(document.getElementById("txtGame1").value);
+            var game2Score = parseInt(document.getElementById("txtGame2").value);
+            var game3Score = parseInt(document.getElementById("txtGame3").value);
+
+            // Change NaNs to 0s
+            startingPins = isNaN(startingPins) ? 0 : startingPins;
+            startingGames = isNaN(startingGames) ? 0 : startingGames;
+            game1Score = isNaN(game1Score) ? 0 : game1Score;
+            game2Score = isNaN(game2Score) ? 0 : game2Score;
+            game3Score = isNaN(game3Score) ? 0 : game3Score;
+
+            // Do calculations
+            var startingAve = startingPins / startingGames;
+            var seriesPins = game1Score + game2Score + game3Score;
+            var seriesAve = seriesPins / NUM_GAMES_IN_SERIES;
+            var newAve = (startingPins + seriesPins) / (startingGames + NUM_GAMES_IN_SERIES);
+
+            // Determine target averages for next week
+            var targetAve1 = Math.floor(newAve) + TARGET_AVE_1_DELTA;
+            var targetAve2 = Math.floor(newAve) + TARGET_AVE_2_DELTA;
+            var targetAve3 = Math.floor(newAve) + TARGET_AVE_3_DELTA;
+            var targetAve4 = Math.floor(newAve) + TARGET_AVE_4_DELTA;
+
+            // Pins to target aves
+            var pinsToTargetAve1 = targetAve1 * (startingGames + (2 * NUM_GAMES_IN_SERIES)) - (startingPins + seriesPins);
+            var pinsToTargetAve2 = targetAve2 * (startingGames + (2 * NUM_GAMES_IN_SERIES)) - (startingPins + seriesPins);
+            var pinsToTargetAve3 = targetAve3 * (startingGames + (2 * NUM_GAMES_IN_SERIES)) - (startingPins + seriesPins);
+            var pinsToTargetAve4 = targetAve4 * (startingGames + (2 * NUM_GAMES_IN_SERIES)) - (startingPins + seriesPins);
+
+            // Analysis inner HTML data
+            var analysis1DefaultHTML = "Please enter starting pins and games.";
+            var analysis2DefaultHTML = "Please enter scores for all three games.";
+            var analysis0HTML = "<ul><li>You started this week with average: " + startingAve.toFixed(NUM_DECIMAL_PLACES) + "</li></ul>"
+            var analysis1HTML = "<ul><li>You started this week with average: " + startingAve.toFixed(NUM_DECIMAL_PLACES) + "</li><li>Your series this week is: " + seriesPins + "<ul><li>Which is a per game average of: " + seriesAve.toFixed(NUM_DECIMAL_PLACES) + "</li></ul></li><li>Your new average is now:" + newAve.toFixed(NUM_DECIMAL_PLACES) + "</li></ul>";
+            var analysis2HTML = "<ul><li>To lower average to " + targetAve1 + ", shoot: " + pinsToTargetAve1 + " (" + Math.ceil(pinsToTargetAve1 / NUM_GAMES_IN_SERIES) + "/game)</li><li>To raise average to " + targetAve2 + ", shoot: " + pinsToTargetAve2 + " (" + Math.ceil(pinsToTargetAve2 / NUM_GAMES_IN_SERIES) + "/game)</li><li>To raise average to " + targetAve3 + ", shoot: " + pinsToTargetAve3 + " (" + Math.ceil(pinsToTargetAve3 / NUM_GAMES_IN_SERIES) + "/game)</li><li>To raise average to " + targetAve4 + ", shoot: " + pinsToTargetAve4 + " (" + Math.ceil(pinsToTargetAve4 / NUM_GAMES_IN_SERIES) + "/game)</li></ul>";
+
+            // Logic to determine which data should be displayed based on state of the form
+            if (startingPins != 0 && startingGames != 0) {
+              if (game1Score != 0 && game2Score != 0 && game3Score != 0) {
+                document.getElementById("analysis").innerHTML = analysis1HTML;
+              }
+              else {
+                document.getElementById("analysis").innerHTML = analysis0HTML;
+              }
+            }
+            else {
+              document.getElementById("analysis").innerHTML = analysis1DefaultHTML;
+            }
+            if (game1Score != 0 && game2Score != 0 && game3Score != 0) {
+              document.getElementById("analysis2").innerHTML = analysis2HTML;
+            }
+            else {
+              document.getElementById("analysis2").innerHTML = analysis2DefaultHTML;
+            }
+
+          }
+
+          function init() {
+            this.document.getElementById("txtStartingPins").focus();
+          }
+
+
+        </script>
+    </head>
+    <body onload="init(); calc();">
+        <!--[if lt IE 7]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+
+        <!-- Add your site or application content here -->
+        <div id="form-main">
+          <div id="form-div">
+            <form class="form" id="form1" onSubmit="blurAll();">
+              <h3>Initial Position</h3>
+              <p class="left-float width-half">
+                <input class="feedback-input" id="txtStartingPins" name="starting-pins" onchange="calc();" placeholder="Starting Pins" type="number" />
+              </p>
+
+              <p class="left-float width-half">
+                <input class="feedback-input" id="txtStartingGames" maxlength="3" name="starting-games" onchange="calc();" placeholder="Starting Games" type="number" />
+              </p>
+
+              <h3>This Week's Games</h3>
+              <p class="clear width-half">
+                <input class="feedback-input" id="txtGame1" maxlength="3" name="game-1" onchange="calc();" placeholder="Game 1" type="number" />
+              </p>
+
+              <p class="width-half">
+                <input class="feedback-input" id="txtGame2" maxlength="3" name="game-2" onchange="calc();" placeholder="Game 2" type="number" />
+              </p>
+
+              <p class="width-half">
+                <input class="feedback-input" id="txtGame3" maxlength="3" name="game-3" onchange="calc();" placeholder="Game 3" type="number" />
+              </p>
+
+              <!--<p class="text clear">
+                <textarea name="text" class="feedback-input" id="comment" placeholder="Comment"></textarea>
+              </p>-->
+
+              <h3>This Week's Analysis</h3>
+              <span id="analysis"></span>
+
+              <h3>Next Week's Analysis</h3>
+              <span id="analysis2"></span>
+
+              <!--<div class="submit">
+                <input type="submit" value="SEND" id="button-blue"/>
+                <div class="ease"></div>
+              </div> -->
+            </form>
+          </div>
+        </div>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.10.2.min.js"><\/script>')</script>
+        <script src="js/plugins.js"></script>
+        <script src="js/main.js"></script>
+
+        <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
+        <script>
+            (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+            function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+            e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+            e.src='//www.google-analytics.com/analytics.js';
+            r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+            ga('create','UA-XXXXX-X');ga('send','pageview');
+        </script>
+    </body>
+</html>
