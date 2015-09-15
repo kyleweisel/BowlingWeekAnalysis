@@ -114,7 +114,7 @@
         <!-- Add your site or application content here -->
         <div id="form-main">
           <div id="form-div">
-            <form class="form" id="form1" onSubmit="blurAll();">
+            <form class="form" id="form1" onSubmit="return true;">
               <h3>Initial Position</h3>
               <p class="left-float width-half">
                 <input class="feedback-input" id="txtStartingPins" name="starting-pins" onchange="calc();" placeholder="Starting Pins" type="number" />
@@ -147,10 +147,10 @@
               <h3>Next Week's Analysis</h3>
               <span id="analysis2"></span>
 
-              <!--<div class="submit">
-                <input type="submit" value="SEND" id="button-blue"/>
+              <div class="submit">
+                <input type="submit" value="SEND" id="button-blue" style="visibility: hidden;"/>
                 <div class="ease"></div>
-              </div> -->
+              </div>
             </form>
           </div>
         </div>
